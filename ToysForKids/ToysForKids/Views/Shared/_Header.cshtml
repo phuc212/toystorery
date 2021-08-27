@@ -1,0 +1,89 @@
+﻿@inject UserManager<AppIdentityUser> userManager
+@inject ICategoryService categoryService
+@{
+    var userId = userManager.GetUserId(User);
+    var user = await userManager.FindByIdAsync(userId);
+    var categories = categoryService.GetAll();
+}
+<!-- Coursel Begin -->
+<header class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-2">
+                <div class="header__logo">
+                    <a asp-controller="Home" asp-action="Index">
+                        <img src="~/images/Logo.png" alt="logo" />
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="header__nav">
+                    <nav class="header__menu mobile-menu">
+                        <ul>
+                            <li class="active"><a asp-action="Index" asp-controller="Home">Homepage</a></li>
+                            <li>
+                                <a href="#">Categories <span class="arrow_carrot-down"></span></a>
+                                <ul class="dropdown">
+                                    @foreach (var item in categories)
+                                    {
+                                        <li><a asp-action="Detail" asp-controller="Category" asp-route-id="@item.CategoryId">@item.CategoryName</a></li>
+                                    }
+                                </ul>
+                            </li>
+                            <li><a href="#">Our Blog</a></li>
+                            <li><a href="#">Contacts</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <nav class="header__menu mobile-menu">
+                    <ul>
+                        <li>
+                            <a asp-route="cart" style="position:relative;"><i class="fas fa-shopping-cart" style="color:white"></i><span id="count" style="position:absolute;top:10px"></span></a>
+                        </li>
+                        @*<li class="active"><a href="#" class="search-switch"><i class="fas fa-search"></i></a></li>*@
+                        <li>
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <a asp-action="Login" asp-controller="Account">
+                                    <i class="far fa-user"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-action="Profile" asp-controller="User" asp-route-id="@user.Id">
+                                    @user.Fullname
+                                </a>
+                            }
+                            <ul class="dropdown">
+                                @if (!User.Identity.IsAuthenticated)
+                                {
+                                    <li><a asp-action="Login" asp-controller="Account">Login</a></li>
+                                    <li><a asp-action="Register" asp-controller="Account">Register</a></li>
+                                }
+                                else
+                                {
+                                    <li><a asp-action="Profile" asp-controller="User" asp-route-id="@user.Id">Profile</a></li>
+                                    <li><a asp-action="Logout" asp-controller="Account">Logout</a></li>
+                                }
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div id="mobile-menu-wrap"></div>
+        </div>
+    </div>
+</header>
+<!-- Coursel End -->
+<!-- Search model Begin -->
+@*<div class="search-model">
+    <div class="h-100 d-flex align-items-center justify-content-center">
+        <div class="search-close-switch"><i class="icon_close"></i></div>
+        <form class="search-model-form">
+            <input type="text" id="search-input" placeholder="Search here.....">
+        </form>
+    </div>
+</div>*@
+<!-- Search model end -->

@@ -1,0 +1,146 @@
+﻿@inject ICategoryService categoryService
+@{
+    var categories = categoryService.GetAll();
+    var categoriesCarousel = categories.Where(c => c.CategoryName != "Drone");
+    ViewData["Title"] = "Home Page";
+    var count = 1;
+}
+<!--Carousel Section Begin -->
+<section class="hero">
+    <div class="container">
+        <div class="hero__slider owl-carousel">
+            @foreach (var item in categoriesCarousel)
+            {              
+                if(count == 5)
+                {
+                    count = 1;
+                }
+                <div class="hero__items set-bg" data-setbg="images/@($"Carousel{count}").jpg">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="hero__text">
+                                <div class="label">RC @item.CategoryName</div>
+                                <h2>Limited Edition.<br>Best collection ever!</h2>
+                                <p>Contact now for free ship over the world!</p>
+                                <a asp-action="Detail" asp-controller="Category" asp-route-id="@item.CategoryId"><span>See More</span> <i class="fa fa-angle-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                count++;
+            }          
+        </div>
+    </div>
+</section>
+<!--Carousel Section Begin -->
+<!-- Product Section Begin -->
+<section class="product spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="row">
+                    @foreach (var items in categories)
+                    {
+                        if (items.CategoryName != "Drone" && items.Products.Count!=0)
+                        {
+                            <div class="col-lg-8 col-md-8 col-sm-8">
+                                <div class="section-title">
+                                    <h4>@items.CategoryName</h4>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4">
+                                <div class="btn__all">
+                                    <a asp-action="Detail" asp-controller="Category" asp-route-id="@items.CategoryId" class="primary-btn">View All <span class="arrow_right"></span></a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @{
+                                    var prod = new Stack<Product>(items.Products);
+                                    var status = "";
+                                }
+                                @for (int i = 0; i < 3; i++)
+                                {
+                                    status = prod.Peek().UnitInStock > 0 ? "In Stock" : "Soldout";
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                                        <div class="product__item">
+                                            <div class="product__item__pic set-bg" data-setbg="images/Products/@prod.Peek().FileAvatarName">
+                                                <div class="ep">@status</div>
+                                                <div class="comment"><i class="fa fa-coins"></i>   @prod.Peek().UnitPrice.ToString("n0") VND</div>
+                                                @if (status == "In Stock")
+                                                {
+                                                    <button class="btn btn-secondary btn-sm view addcart" data-productid="@prod.Peek().ProductId"><i class="fa fa-shopping-cart"></i>  ADD</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-secondary btn-sm view addcart" disabled><i class="fa fa-shopping-cart"></i>  ADD</button>
+                                                }
+                                            </div>
+                                            <div class="product__item__text">
+                                                <h5><a asp-action="Detail" asp-controller="Product" asp-route-id="@prod.Peek().ProductId">@prod.Pop().ProductName</a></h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-8">
+                <div class="product__sidebar">
+                    <div class="product__sidebar__view">
+                        @foreach (var items in categories)
+                        {
+                            if (items.CategoryName == "Drone")
+                            {
+                                <div class="section-title">
+                                    <h5>Drone</h5>
+                                </div>
+                                <a class="filter__controls primary-btn" asp-action="Detail" asp-controller="Category" asp-route-id="@items.CategoryId">
+                                    View All <span class="arrow_right"></span>
+                                </a>
+                                <div class="filter__gallery">
+                                    @{
+                                        var prod = new Stack<Product>
+                                        (items.Products);
+                                        var status = "";
+                                        @for (int i = 0; i < 5; i++)
+                                        {
+                                            status = prod.Peek().UnitInStock > 0 ? "In Stock" : "Soldout";
+                                            if (status == "In Stock")
+                                            {
+                                                <div class="product__sidebar__view__item set-bg"
+                                                     data-setbg="images/Products/@prod.Peek().FileAvatarName">
+                                                    <div class="ep">
+                                                        <i class="fa fa-coins"></i>   @prod.Peek().UnitPrice.ToString("n0") VND
+                                                    </div>
+                                                    <button class="view addcart" data-productid="@prod.Peek().ProductId"><i class="fa fa-shopping-cart"></i>  ADD</button>
+                                                    <h5><a asp-action="Detail" asp-controller="Product" asp-route-id="@prod.Peek().ProductId">@prod.Pop().ProductName</a></h5>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="product__sidebar__view__item set-bg"
+                                                     data-setbg="images/Products/@prod.Peek().FileAvatarName">
+                                                    <div class="ep">
+                                                        <i class="fa fa-coins"></i>   @status
+                                                    </div>
+                                                    <button class="btn btn-secondary btn-sm view" disabled><i class="fa fa-shopping-cart"></i>  ADD</button>
+                                                    <h5><a asp-action="Detail" asp-controller="Product" asp-route-id="@prod.Peek().ProductId">@prod.Pop().ProductName</a></h5>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Product Section End -->
+@section Scripts{ 
+<script src="~/js/scripts/cart.js" asp-append-version="true"></script>
+}

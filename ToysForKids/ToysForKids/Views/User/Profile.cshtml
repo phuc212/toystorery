@@ -1,0 +1,66 @@
+﻿@model ToysForKids.Models.ViewModels.UserEditViewModel
+@inject RoleManager<IdentityRole> roleManager
+@inject UserManager<AppIdentityUser> userManager
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "_DashboardLayout";
+    var roles = roleManager.Roles;
+    var user = await userManager.GetUserAsync(User);
+    var userRole = await userManager.GetRolesAsync(user);
+    var roleName = userRole != null ? string.Join(", ", userRole) : ""; ;
+}
+
+<h4>Profile</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input hidden asp-for="UserId" class="form-control" />
+            <div class="form-group">
+                <label asp-for="Fullname" class="control-label"></label>
+                <input asp-for="Fullname" class="form-control" />
+                <span asp-validation-for="Fullname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" disabled />
+                <input hidden asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            @if (roleName == "Admin")
+            {
+                <div class="form-group">
+                    <label asp-for="RoleId" class="control-label"></label>
+                    <select asp-for="RoleId" class="custom-select">
+                        @if (roles != null & roles.Any())
+                        {
+                            foreach (var item in roles)
+                            {
+                                <option value="@item.Id" selected="@(item.Id==Model.RoleId)">@item.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+                }
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn border" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
